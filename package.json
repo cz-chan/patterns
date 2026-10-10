@@ -8,7 +8,9 @@
 	],
 	"scripts": {
 		"dev": "bun --filter agentic-patterns dev",
-		"clean": "rm -rf node_modules */node_modules"
+		"clean": "rm -rf node_modules */node_modules",
+		"dev:agentic": "bun --filter agentic-patterns dev",
+		"dev:design": "bun run --filter design-patterns dev:monorepo"
 	},
 	"devDependencies": {
 		"@types/bun": "1.4.2",

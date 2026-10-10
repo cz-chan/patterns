@@ -3,6 +3,7 @@
 	"type": "module",
 	"private": true,
 	"scripts": {
-		"dev": "bun --watch"
+		"dev": "bun --watch",
+		"dev:monorepo": "bun --watch index.ts"
 	}
 }

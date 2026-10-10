@@ -1,32 +1,131 @@
 /*
-* output de openai sin tools:
-
-┌─ [witout-tools] step 1 · 451 tokens
-│   │  TEXT  → Necesito los precios y la duración (en horas) de cada curso para calcularlo exactamente. ¿Me los facilitas? Puedes darme, por ejemplo:
-│ 
-│ - Precio Curso
+* output de gemini dejando que calcule por el mismo las cosas:
+│   ┌─ [without-tools] step 1 · 226 tokens
+│   │  TEXT  → ¡Hola! Para poder darte el precio exacto y las horas totales, **necesito que me digas a qué cursos te refieres específicamente** (por ejemplo, de qué 
 │   └─
 │ 
-│  Respuesta:  Necesito los precios y la duración (en horas) de cada curso para calcularlo exactamente. ¿Me los facilitas? Puedes darme, por ejemplo:
+│  Respuesta:  ¡Hola! Para poder darte el precio exacto y las horas totales, **necesito que me digas a qué cursos te refieres específicamente** (por ejemplo, de qué plataforma son: Udemy, Platzi, Coursera, etc., o cuáles son sus precios y duración base), ya que los costos varían mucho de una plataforma a otra.
 │ 
-│ - Precio Curso TypeScript: (moneda)
-│ - Horas Curso TypeScript:
-│ - Precio Curso Docker: (misma moneda)
-│ - Horas Curso Docker:
+│ Sin embargo, si me das los datos o los nombres de los cursos, con mucho gusto hago el cálculo matemático por ti:
 │ 
-│ Si prefieres, puedo usar un ejemplo orientativo (y en ese caso indícame la moneda). Ejemplo rápido: si TypeScript cuesta 50 € y dura 20 h, y Docker cuesta 60 € y dura 15 h:
+│ 1. **Samo los precios** de ambos cursos para obtener el total sin descuento.
+│ 2. **Le aplico el 20% de descuento** ($Total \times 0.80$) para darte el precio final.
+│ 3. **Sumo las horas** de duración de ambos para darte el total de tiempo.
 │ 
-│ - Precio total sin descuento = 50 + 60 = 110 €
-│ - Con 20% de descuento = 110 × 0.8 = 88 €
-│ - Horas totales = 20 + 15 = 35 h
+│ ¡Quedo a la espera de los detalles de los cursos para hacer las cuentas!
 │ 
-│ Dime los precios y horas reales (y la moneda) y lo calculo exactamente.
+│ 
+│   ┌─ [with-tools] step 1 · 192 tokens
+│   │  TOOL  → findCourses({"text":"TypeScript"})
+│   │  RESULT← {"found":2,"courses":[{"id":"ts-01","title":"TypeScript desde cero","hours":22,"priceUSD":19.99,"level":"basic","students":48120},{"id":"agt-04","titl
+│   └─
+│ 
+│   ┌─ [with-tools] step 2 · 322 tokens
+│   │  TOOL  → findCourses({"text":"Docker"})
+│   │  RESULT← {"found":1,"courses":[{"id":"dkr-05","title":"Docker para desarrolladores","hours":14,"priceUSD":17.99,"level":"basic","students":35770}]}
+│   └─
+│ 
+│   ┌─ [with-tools] step 3 · 537 tokens
+│   │  TEXT  → Para calcular el costo y las horas totales, tomaremos los cursos principales de cada tecnología:
+│ 
+│ 1. **TypeScript desde cero**
+│    - **Precio:** $19.99
+│   └─
+│ 
+│  Respuesta:  Para calcular el costo y las horas totales, tomaremos los cursos principales de cada tecnología:
+│ 
+│ 1. **TypeScript desde cero**
+│    - **Precio:** $19.99 USD
+│    - **Duración:** 22 horas
+│ 
+│ 2. **Docker para desarrolladores**
+│    - **Precio:** $17.99 USD
+│    - **Duración:** 14 horas
+│ 
+│ ### Totales:
+│ * **Horas totales:** 36 horas
+│ * **Precio regular total:** $37.98 USD
+│ * **Con el 20% de descuento:** **$30.38 USD** (te ahorras $7.60 USD).
 │ 
 │ 
 │  ======= Comparativa ========
 │ ┌───────────┬───────┬─────────────┐
 │ │           │ steps │ totalTokens │
 │ ├───────────┼───────┼─────────────┤
-│ │ sin tools │ 1     │ 451         │
+│ │ sin tools │ 1     │ 226         │
+│ │ con tools │ 3     │ 1051        │
 │ └───────────┴───────┴─────────────┘
+! ojo: con tools el coste se hace exponencial pero a veces es necesario
+*/
+
+/*
+* output haciendo que calcule los descuentos a través de una función propia
+
+ ┌─ [without-tools] step 1 · 215 tokens
+│   │  TEXT  → ¡Hola! Para poder darte el precio exacto y las horas totales, **necesito que me digas a qué cursos te refieres específicamente** (por ejemplo, de qué 
+│   └─
+│ 
+│  Respuesta:  ¡Hola! Para poder darte el precio exacto y las horas totales, **necesito que me digas aagentic-patterns dev $ bun src/main.ts
+│ [8 lines elided]
+│ 
+│ 1. **Samo el precio del Curso de TypeScript + Curso de Docker.**
+│ 2. **Aplico el 20% de descuento** al total ($ \text{Total} \times 0.80 $).
+agentic-patterns dev $ bun src/main.ts
+│ [14 lines elided]
+│ 
+│ 
+│   ┌─ [with-tools] step 1 · 207 tokens
+agentic-patterns dev $ bun src/main.ts
+│ 
+│   ┌─ [without-tools] step 1 · 215 tokens
+│   │  TEXT  → ¡Hola! Para poder darte el precio exacto y las horas totales, **necesito que me digas a qué cursos te refieres específicamente** (por ejemplo, de qué 
+│   └─
+│ 
+│  Respuesta:  ¡Hola! Para poder darte el precio exacto y las horas totales, **necesito que me digas a qué cursos te refieres específicamente** (por ejemplo, de qué plataforma son: Udemy, Platzi, Coursera, etc., o cuáles son sus precios y duración base), ya que los costos varían mucho de una plataforma a otra.
+│ 
+│ Sin embargo, si me das los datos o los nombres de los cursos, con mucho gusto hago el cálculo matemático por ti:
+│ 
+│ 1. **Samo el precio del Curso de TypeScript + Curso de Docker.**
+│ 2. **Aplico el 20% de descuento** al total ($ \text{Total} \times 0.80 $).
+│ 3. ** Sumo las horas** de ambos cursos para darte la duración total.
+│ 
+│ ¡Quedo a la espera de esa información para ayudarte!
+│ 
+│ 
+│   ┌─ [with-tools] step 1 · 207 tokens
+│   │  TOOL  → findCourses({"text":"TypeScript"})
+│   │  TOOL  → findCourses({"text":"Docker"})
+│   │  RESULT← {"found":2,"courses":[{"id":"ts-01","title":"TypeScript desde cero","hours":22,"priceUSD":19.99,"level":"basic","students":48120},{"id":"agt-04","titl
+│   │  RESULT← {"found":1,"courses":[{"id":"dkr-05","title":"Docker para desarrolladores","hours":14,"priceUSD":17.99,"level":"basic","students":35770}]}
+│   └─
+│ 
+│   ┌─ [with-tools] step 2 · 619 tokens
+│   │  TEXT  → Para responder a tu pregunta, tomé en cuenta los siguientes cursos principales de nuestro catálogo:
+│ 
+│ 1. **TypeScript desde cero** (22 horas) – Precio:
+│   └─
+│ 
+│  Respuesta:  Para responder a tu pregunta, tomé en cuenta los siguientes cursos principales de nuestro catálogo:
+│ 
+│ 1. **TypeScript desde cero** (22 horas) – Precio: $19.99 USD
+│ 2. **Docker para desarrolladores** (14 horas) – Precio: $17.99 USD
+│ 
+│ *(Nota: En TypeScript también tenemos "Agentes de IA con TypeScript", pero el curso fundamental y más directo para aprender el lenguaje es "TypeScript desde cero").*
+│ 
+│ ### Cálculos:
+│ * **Precio total sin descuento:** $19.99 + $17.99 = **$37.98 USD**
+│ * **Descuento (20%):** $37.98 × 0.20 = **$7.60 USD**
+│ * **Precio final con el 20% de descuento:** $37.98 - $7.60 = **$30.38 USD**
+│ * **Duración total:** 22 horas + 14 horas = **36 horas** en total.
+│ 
+│ 
+│  ======= Comparativa ========
+│ ┌───────────┬───────┬─────────────┐
+│ │           │ steps │ totalTokens │
+│ ├───────────┼───────┼─────────────┤
+│ │ sin tools │ 1     │ 215         │
+│ │ con tools │ 2     │ 826         │
+│ └───────────┴───────┴─────────────┘
+
+!hay una pequeña diferencia entre usar tools que le damos para que haga algunos cálculos o que el modelo haga los cálculos por el mismo. todo lo que sea ahorrar coste, bienvenido sea
 */

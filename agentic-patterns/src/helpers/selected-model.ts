@@ -33,10 +33,10 @@ import { ollama } from "ollama-ai-provider-v2";
 // export const model = anthropic("claude-sonnet-5-5");
 
 // OpenAI:
-export const model = openai("gpt-5-mini");
+// export const model = openai("gpt-5-mini");
 
 // Gemini:
-// export const model = google("gemini-3.5-flash-lite");
+export const model = google("gemini-3.5-flash-lite");
 
 // Ollama:
 // export const model = ollama('gpt-oss');

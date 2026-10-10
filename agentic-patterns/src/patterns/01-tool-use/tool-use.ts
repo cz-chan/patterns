@@ -72,7 +72,7 @@ const QUESTION =
 
 async function withoutTools() {
 	// para ver la cadena de pensamiento
-	const tracer = createTracer("witout-tools");
+	const tracer = createTracer("without-tools");
 
 	const { text } = await generateText({
 		model: model,
@@ -99,7 +99,7 @@ const findCourses = tool({
 			.string()
 			.optional()
 			.describe("texto a buscar en el título del curso"),
-		level: z.enum(["basic", "intermediate", "advanced"]),
+		level: z.enum(["basic", "intermediate", "advanced"]).optional(),
 	}),
 	execute: async ({ level, text }) => {
 		// level y text es lo que has puesto como el obj inputSchema, si pones más, se mostrarán
@@ -121,11 +121,79 @@ const findCourses = tool({
 	},
 });
 
+const calculateTotal = tool({
+	description:
+		"calcula el precio total de una lista de cursos, aplicando un descuento porcentual," +
+		" utiliza siempre para cualquier operación aritmética, no calcules mentalmente",
+	inputSchema: z.object({
+		courseIDs: z
+			.array(z.string())
+			.describe("Courses id. ej ['ts-01', 'dkr-02']"), // es bueno poner un describe
+		discuontPercent: z.number().min(0).max(100).default(0),
+	}),
+	execute: async ({ courseIDs, discuontPercent }) => {
+		// buscar los datops en la db (o en nuestro caso en la const)
+		const foundCourses = COURSE_CATALOG.filter((course) =>
+			courseIDs.includes(course.id),
+		);
+		const notFound = courseIDs.filter(
+			(findedID) => !COURSE_CATALOG.some((course) => course.id === findedID),
+		);
+
+		if (notFound) {
+			throw new Error("Course not found");
+		}
+
+		const subTotal = foundCourses.reduce(
+			(acc, course) => acc + course.priceUSD,
+			0,
+		);
+
+		const discount = subTotal * (discuontPercent / 100);
+
+		return {
+			subtotal: Number(subTotal.toFixed(2)),
+			discount: Number(discount.toFixed(2)),
+			total: Number(subTotal - discount).toFixed(2),
+			notFound: notFound,
+		};
+	},
+});
+
+async function withTools() {
+	// para ver la cadena de pensamiento
+	const tracer = createTracer("with-tools");
+
+	const { text } = await generateText({
+		model: model,
+		tools: {
+			findCourses, // esto es la herramienta
+		},
+		prompt: QUESTION,
+		// las instructions antes eran system y sin el "system prompt" que le dice al agente qué es y qué
+		// hace mientras que el prompt es aquella consulta que un usuario puede hacerle
+		instructions:
+			"eres un asistente de catálogo de cursos de detalles no inventes," +
+			" precios duraciones ni nombres de cursos. Consúltalo siempre " +
+			"con las herramientas disponibles.",
+		onStepEnd: tracer.onStepFinish,
+		// ⬇️ esto último sería un "patron" circuit breaker donde si algo está mal hecho y no hay
+		// ningún tope, va a seguir ejecutándose y gastanco. de esta forma le pones un límite de pasos
+		stopWhen: stepCountIs(6),
+	});
+
+	console.log("\n Respuesta: ", text.green);
+	console.log();
+	return tracer.summary();
+}
+
 export async function toolUseMain() {
 	const resultA = await withoutTools();
+	const resultB = await withTools();
 
 	console.log("\n ======= Comparativa ========");
 	console.table({
 		"sin tools": resultA,
+		"con tools": resultB,
 	});
 }

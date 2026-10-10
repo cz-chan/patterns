@@ -194,20 +194,124 @@ async function withoutPlanning() {
 // ---------------------------------------------------------------------------
 // B) CON PLANIFICACIÓN — primero el plan, luego la ejecución
 // ---------------------------------------------------------------------------
-// TODO:
+async function buildPlan(tracer: ReturnType<typeof createTracer>) {
+	/*
+	recibe un tracer que es del tipo que retorna la función createTracer:
+		{
+			onStepFinish({ toolCalls, toolResults, text, usage, }: GenerateTextStepEndEvent): void;
+			summary: () => {
+			steps: number;
+			totalTokens: number;
+			};
+		}
+	*/
+
+	// interfaz para el output
+	const planSchema = z.object({
+		steps: z
+			.array(
+				z.object({
+					goal: z
+						.string()
+						.describe(
+							"A description of what this step accomplishes, in one sentence.",
+						),
+					reason: z
+						.string()
+						.describe(
+							"Why is this step necessary? And why is it in this possition?",
+						),
+				}),
+			)
+			.min(2)
+			.max(12)
+			.describe("sort steps. each step only resolve a unique thing"),
+	});
+
+	const { text, output } = await generateText({
+		/*
+		el texto es el producto de la IA uqe te va a dar que sin output es el output
+		el output es la forma en cómo quieres que te devuelva ese text
+
+		aquí no uso el text sino el output ya que vendría incluido solo que le estás
+		dando una forma concreta
+		*/
+		model,
+		prompt: MISSION,
+		// ⬇️ planificación
+		instructions:
+			"eres un estratega. No resuelvas el operativo todavía." +
+			" Responde en español. " +
+			"Solo descómponlo en pasos ordenados donde cada paso dependa del resultado anterior.",
+		onStepEnd: tracer.onStepFinish,
+
+		//output: "el objeto resultante debe tener el schema ..."
+		output: Output.object({
+			schema: planSchema,
+		}),
+	});
+
+	return output.steps;
+}
+
+async function withPlanning() {
+	console.log("====== PLANNING ".blue);
+	const tracer = createTracer("with planning");
+
+	// fase 1: planificación y construir plan
+	const steps = await buildPlan(tracer);
+	// console.log("stpes".red, steps);
+
+	// fase 2: ejecución paso a paso
+	const findings: string[] = [];
+
+	for (const [index, step] of steps.entries()) {
+		// console.log(`\n ejecitando paso ${index + 1}: ${step.goal.blue}`);
+
+		const { text } = await generateText({
+			model,
+			instructions:
+				"you must resolve the given step" + "Don't get ahead to the next steps",
+			prompt:
+				`original mission: ${MISSION} \n\n` +
+				(findings.length
+					? `resolve for now: ${findings.join("\n --- \n")}\n\n`
+					: `` + `current step: ${step.goal}`),
+			onStepEnd: tracer.onStepFinish,
+		});
+
+		// cuando tengas un resultado del generateTexto, es cuando se puede mandar al findings
+		findings.push(`[${step.goal}]\n ${text.trim()}`);
+	}
+
+	// fase 3: sintetizar e integrar los pasos anteriores
+	const { text: finalPlan } = await generateText({
+		model,
+		prompt:
+			`Mission: \n${MISSION} \n\n` +
+			`Partial results: \n ${findings.join("\n---\n")}`,
+		instructions:
+			`combine partial results into a unique final summary.` +
+			"Be concisious: order and priorities",
+		onStepEnd: tracer.onStepFinish,
+	});
+	console.log("\n\n final plan: ", finalPlan);
+
+	return tracer.summary();
+}
 
 // ---------------------------------------------------------------------------
 // MAIN
 // ---------------------------------------------------------------------------
 // TODO:
 export async function planningMain() {
-	const a = await withoutPlanning();
-	// const b = await withPlanning();
+	// const a = await withoutPlanning();
+	const b = await withPlanning();
 
 	console.log("\n═══ COMPARATIVA ═══\n".blue);
 	console.table({
-		"Sin planificación": a,
-		// 'Con planificación': b,
+		// "Sin planificación": a,
+		"Con planificación": b,
 	});
 
 	console.log(

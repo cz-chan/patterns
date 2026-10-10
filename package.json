@@ -1,0 +1,17 @@
+{
+	"name": "workspaces",
+	"private": true,
+	"type": "module",
+	"workspaces": [
+		"agentic-patterns",
+		"design-patterns"
+	],
+	"scripts": {
+		"dev": "bun --filter agentic-patterns dev",
+		"clean": "rm -rf node_modules */node_modules"
+	},
+	"devDependencies": {
+		"@types/bun": "1.4.2",
+		"typescript": "7.0.2"
+	}
+}

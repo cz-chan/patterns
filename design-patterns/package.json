@@ -1,0 +1,8 @@
+{
+	"name": "design-patterns",
+	"type": "module",
+	"private": true,
+	"scripts": {
+		"dev": "bun --watch"
+	}
+}

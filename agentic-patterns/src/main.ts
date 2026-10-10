@@ -1,6 +1,10 @@
-import './helpers/string-colors.ts';
-import { getMessageFromModel } from './actions/get-message-model.ts';
+import "./helpers/string-colors.ts";
+import {
+	getMessageFromModel,
+	getMessageFromModelFailSafe,
+} from "./actions/get-message-model.ts";
 
 console.clear();
 
-await getMessageFromModel();
+// await getMessageFromModel();
+await getMessageFromModelFailSafe();

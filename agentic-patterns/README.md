@@ -47,4 +47,5 @@ npm install
 ```
 
 Esto modificará tu `package.json` con las versiones más recientes.
+
 # patterns

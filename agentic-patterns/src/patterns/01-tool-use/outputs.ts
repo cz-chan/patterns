@@ -1,4 +1,16 @@
 /*
+Explicación del patron:
+
+Es proveer a la AI de herramientas(tool) que pueda usar para 
+hacer una mejor tarea o poder completarla porque habrá casos en 
+los que necesite de manera obligatoria para completar la tarea
+de una tool. Si no la tiene, podría no completar la tarea o 
+alucinar e inventarse un resultado.
+
+asstes: https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works
+*/
+
+/*
 * output de gemini dejando que calcule por el mismo las cosas:
 │   ┌─ [without-tools] step 1 · 226 tokens
 │   │  TEXT  → ¡Hola! Para poder darte el precio exacto y las horas totales, **necesito que me digas a qué cursos te refieres específicamente** (por ejemplo, de qué 

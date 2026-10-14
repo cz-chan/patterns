@@ -8,6 +8,7 @@ import { planningMain } from "./patterns/02-planning/planning.ts";
 import { reflectionMain } from "./patterns/03-reflection/reflection.ts";
 import { reActSimpleMain } from "./patterns/04-reAct/reAct-loop.ts";
 import { reActWeatherMain } from "./patterns/04-reAct/reAct-loop.task.ts";
+import { promptChainingMain } from "./patterns/05-prompt-chaining/prompt-chaining.ts";
 
 console.clear();
 
@@ -18,4 +19,5 @@ console.clear();
 // await planningMain();
 // await reflectionMain();
 // await reActSimpleMain();
-await reActWeatherMain();
+// await reActWeatherMain();
+await promptChainingMain();

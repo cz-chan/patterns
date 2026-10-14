@@ -6,6 +6,8 @@ import {
 import { toolUseMain } from "./patterns/01-tool-use/tool-use.ts";
 import { planningMain } from "./patterns/02-planning/planning.ts";
 import { reflectionMain } from "./patterns/03-reflection/reflection.ts";
+import { reActSimpleMain } from "./patterns/04-reAct/reAct-loop.ts";
+import { reActWeatherMain } from "./patterns/04-reAct/reAct-loop.task.ts";
 
 console.clear();
 
@@ -14,4 +16,6 @@ console.clear();
 
 // await toolUseMain();
 // await planningMain();
-await reflectionMain();
+// await reflectionMain();
+// await reActSimpleMain();
+await reActWeatherMain();

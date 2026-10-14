@@ -1,5 +1,16 @@
 /*
-los modelos a usar van a ser "haiku" y "6-luna"
+explicación del patrón:
+
+este patrón permite a la AI "reflexionar" sobre aquello que está ejecutando
+para poder entender si era lo que estaba esperando el usaurio a través de 
+feedback y/o una "reflexión" o crítica sobre su misma respuesta comparándola
+con data externa que le dice si está bien o no.
+
+Por lo general se le obliga a citar y enumarar de manera explícita qué objetivos
+no está alcanzando para volver a enviárselos a ella misma y solo itere sobre ellos. 
+
+assets: https://www.langchain.com/blog/reflection-agents
+
 */
 
 /*

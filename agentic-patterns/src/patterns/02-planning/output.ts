@@ -1,4 +1,15 @@
 /*
+explicación del patrón:
+
+la idea de este patrón es proveer a la AI de algún método, ya sea por nuestra parte
+o indicando que lo haga ella, para desestructurar una tarea compleja en subtareas
+consecuentes que le permitan llegar a un resultado más optimo con mayor facilidad
+y tener mayor accuracy.
+
+assets: https://www.snowflake.com/en/artificial-intelligence/agents/agent-planning/
+*/
+
+/*
  * puebas con "claude-sonnet-5-5", "claude-haiku-5-5", "gpt-5-mini" y "gpt-6-luna"
 
   !! las conclusiones: LA API DE ANTHROPIC ES DESCARADAMENTE CARA :/

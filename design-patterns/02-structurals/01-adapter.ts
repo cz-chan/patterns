@@ -19,3 +19,13 @@
  * la librería por otra sin tocar el código fuente es muy útil. solo tienes que adaptar
  * la nueva al adapter que ya tienes creado para que no se rompa nada
  */
+
+import { LocalLogger } from "./adapter-files/local-logger";
+import { DenoLoggerAdapter } from "./adapter-files/logger-adapter";
+
+// const logger = new LocalLogger("01-adapter.ts"); // esto sería la importación de nuestro logger
+const logger = new DenoLoggerAdapter("01-adapter.ts"); // el adaptar funciona igual
+
+logger.writeLog("Log normal");
+logger.writeError("Log error");
+logger.writeWarning("Log warning");

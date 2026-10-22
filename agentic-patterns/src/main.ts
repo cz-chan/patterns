@@ -10,6 +10,7 @@ import { reActSimpleMain } from "./patterns/04-reAct/reAct-loop.ts";
 import { reActWeatherMain } from "./patterns/04-reAct/reAct-loop.task.ts";
 import { promptChainingMain } from "./patterns/05-prompt-chaining/prompt-chaining.ts";
 import { planAndExecuteMain } from "./patterns/06-plan-n-execute/plan-n-execute.ts";
+import { codeActMain } from "./patterns/07-code-act/code-act.ts";
 
 console.clear();
 
@@ -22,4 +23,5 @@ console.clear();
 // await reActSimpleMain();
 // await reActWeatherMain();
 // await promptChainingMain();
-await planAndExecuteMain();
+// await planAndExecuteMain();
+await codeActMain();
